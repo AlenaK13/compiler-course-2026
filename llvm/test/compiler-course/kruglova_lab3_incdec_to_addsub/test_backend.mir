@@ -1,6 +1,7 @@
 # RUN: llc -mtriple=x86_64-unknown-linux-gnu \
-# RUN: --load=%builddir/lib/kruglova_lab3_BACKEND.so \
+# RUN: -load %p/../../../../build/lib/kruglova_lab3_BACKEND.so \
 # RUN: -run-pass=kruglova_incdec_to_addsub-x86 %s -o - | FileCheck %s
+
 --- |
   define void @inc_chain() { ret void }
   define void @dec_chain() { ret void }
