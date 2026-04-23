@@ -80,27 +80,35 @@ bool kruglova_incdec_to_addsub::runOnMachineFunction(MachineFunction &MF) {
       SmallVector<MachineInstr *, 4> Chain;
       Chain.push_back(&MI);
 
+      MachineInstr *Curr = &MI;
       while (true) {
-        if (!MRI.hasOneNonDBGUse(Dst))
+
+        MachineInstr *Next = Curr->getNextNode();
+
+        if (!Next)
+          break;
+        if (EraseSet.count(Next))
           break;
 
-        MachineInstr &Next = *MRI.use_nodbg_instructions(Dst).begin();
-
-        if (Next.getParent() != &MBB)
-          break;
-
-        auto NextInfo = get_info(Next.getOpcode());
+        auto NextInfo = get_info(Next->getOpcode());
         if (NextInfo.delta == 0)
           break;
 
-        if (Next.readsRegister(X86::EFLAGS, TRI))
+        if (Next->getOperand(1).getReg() != Dst)
+          break;
+        if (!MRI.hasOneNonDBGUse(Dst))
+          break;
+        if (Next->readsRegister(X86::EFLAGS, TRI))
           break;
 
         Sum += NextInfo.delta;
-        Chain.push_back(&Next);
-
-        Dst = Next.getOperand(0).getReg();
+        Chain.push_back(Next);
+        Dst = Next->getOperand(0).getReg();
+        Curr = Next;
       }
+
+      if (Chain.size() < 2 && Sum == info.delta)
+        continue;
 
       unsigned Opc = 0;
       int Imm = 0;
