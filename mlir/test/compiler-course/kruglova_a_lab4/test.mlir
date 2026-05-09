@@ -1,5 +1,8 @@
 // RUN: mlir-opt -load-pass-plugin=%mlir_lib_dir/kruglova_a_lab4_MLIR.so --pass-pipeline="builtin.module(func-call-counter)" %s 2>&1 | FileCheck %s
 
+// тест  проверка вывода общего количества операций в консоль
+// CHECK: Count operations: 20
+
 // тест 1 проверка базового подсчета 
 // CHECK: func.func @target_simple() attributes {call_count = 1 : i32}
 func.func @target_simple() {
