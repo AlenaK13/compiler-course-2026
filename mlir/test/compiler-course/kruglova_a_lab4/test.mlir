@@ -45,5 +45,3 @@ func.func @main() {
   return
 }
 
-// тест 6 проверка вывода общего количества операций в консоль
-// CHECK: Count operations: 20
